@@ -2,11 +2,14 @@
 #define CAMERA_H
 
 #include "functions.h"
-
+#include <vector>
 #include "color.h"
 #include "hittable.h"
 #include <iostream>
 #include "material.h"
+#include <chrono>
+
+#include<omp.h>
 
 class camera {
   public:
@@ -24,24 +27,39 @@ class camera {
     double defocus_angle = 0;  // Variation angle of rays through each pixel
     double focus_dist = 10;    // Distance from camera lookfrom point to plane of perfect focus
 
-    void render(const hittable& world) {
+    void render(const hittable& world,int nb_threads) {
         initialize();
+        auto start = std::chrono::high_resolution_clock::now();
 
         std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
+        std::vector<color> buffer(image_width * image_height);
+
+        color pixel_color(0,0,0);
+        ray r;
+        #pragma omp parallel for num_threads(nb_threads) shared(world,buffer) schedule(dynamic, 1)//private(pixel_color, r) 
         for (int j = 0; j < image_height; ++j) {
-            std::clog << "\rScanlines remaining: " << (image_height - j) << ' ' << std::flush;
+            std::clog << "\rLignes restantes : " << (image_height - j) << " \n " << std::flush;
+            
             for (int i = 0; i < image_width; ++i) {
                 color pixel_color(0,0,0);
                 for (int sample = 0; sample < samples_per_pixel; ++sample) {
                     ray r = get_ray(i, j);
                     pixel_color += ray_color(r, max_depth, world);
                 }
-                write_color(std::cout, pixel_color, samples_per_pixel);
+                buffer[j * image_width + i] = pixel_color;
+                // write_color(std::cout, pixel_color, samples_per_pixel);
             }
         }
 
+        for (const auto& pixel_color : buffer) {
+            write_color(std::cout, pixel_color, samples_per_pixel);
+        }
+
         std::clog << "\rDone.                 \n";
+        auto end = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> diff = end-start;
+        std::clog << "Temps d'execution : " << diff.count() << " s\n";
     }
 
   private:
