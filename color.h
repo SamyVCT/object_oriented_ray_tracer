@@ -17,7 +17,7 @@ void write_color(std::ostream &out, color pixel_color, int samples_per_pixel) {
     auto g = pixel_color.y();
     auto b = pixel_color.z();
 
-    // Divide the color by the number of samples.
+    // On divise la couleur par le nombre de samples pour obtenir la moyenne
     auto scale = 1.0 / samples_per_pixel;
     r *= scale;
     g *= scale;
@@ -28,7 +28,7 @@ void write_color(std::ostream &out, color pixel_color, int samples_per_pixel) {
     g = linear_to_gamma(g);
     b = linear_to_gamma(b);
 
-    // Write the translated [0,255] value of each color component.
+    // On écrit la valeur entre 0 et 255 pour chaque couleur RGB
     static const interval intensity(0.000, 0.999);
     out << static_cast<int>(256 * intensity.clamp(r)) << ' '
         << static_cast<int>(256 * intensity.clamp(g)) << ' '

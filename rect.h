@@ -5,7 +5,7 @@
 
 #include "hittable.h"
 
-class xy_rect : public hittable {
+class xy_rect : public hittable { // on fixe z = k
     public:
         xy_rect() {}
 

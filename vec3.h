@@ -7,8 +7,8 @@
 using std::sqrt;
 
 
-// we will temporarily use the same class for colors, locations, and directions
-// quite risky, because we could substract a color to a position w/o warnings so later we will use inheritance to make a color class
+// On a utilisé temporairment la même classe pour les couleurs, les positions et les directions, 
+//mais c'est risqué car on pourrait soustraire une couleur à une position sans avertissements, donc ensuite on utilisera l'héritage pour faire une classe couleur
 class vec3 {
   public:
     double e[3];

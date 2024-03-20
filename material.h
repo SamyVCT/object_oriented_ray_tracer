@@ -78,7 +78,7 @@ class dielectric : public material { // les matériaux transparents (verre, eau,
     }
 
   private:
-    double ir; // Index of Refraction
+    double ir; // indice de réfraction
 
     static double reflectance(double cosine, double ref_idx) {
         // La réflexion du verre dépend de l'angle d'incidence : on utilise l'approximation de Schlick

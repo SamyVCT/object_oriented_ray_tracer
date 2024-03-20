@@ -9,23 +9,22 @@
 #include "material.h"
 #include <chrono>
 
-#include<omp.h>
+#include<omp.h> // OpenMP pour le multi-threading
 
 class camera {
   public:
-    /* Public Camera Parameters Here */
-    double aspect_ratio = 1.0;  // Ratio of image width over height
-    int    image_width  = 100;  // Rendered image width in pixel count
-    int    samples_per_pixel = 10;   // Count of random samples for each pixel
-    int    max_depth         = 10;   // la fonction ray_color est récursive, et s'arrête seulement lorsqu'elle ne touche plus d'objets (ce qui peut prendre un moment), donc on définit un nombre de rebonds maixmum
+    double aspect_ratio = 1.0;  // Ratio largeur/hauteur de l'image
+    int    image_width  = 100;  // Largeur de l'image en pixels
+    int    samples_per_pixel = 10;   // Nombre de samples par pixel
+    int    max_depth         = 10;   // la fonction ray_color est récursive, et s'arrête seulement lorsqu'elle ne touche plus d'objets (ce qui peut prendre un moment), donc on définit un nombre de rebonds maximum
 
     double vfov = 90;  // Angle de vue vertical (Field Of View) en degrés (90° = grand angle, 20° = téléobjectif, 180° = fish-eye)
-    point3 lookfrom = point3(0,0,-1);  // Point camera is looking from
-    point3 lookat   = point3(0,0,0);   // Point camera is looking at
-    vec3   vup      = vec3(0,1,0);     // Camera-relative "up" direction
+    point3 lookfrom = point3(0,0,-1);  // position de la caméra
+    point3 lookat   = point3(0,0,0);   // position où la caméra regarde
+    vec3   vup      = vec3(0,1,0);     // vecteur indiquant le haut de la caméra
 
-    double defocus_angle = 0;  // Variation angle of rays through each pixel
-    double focus_dist = 10;    // Distance from camera lookfrom point to plane of perfect focus
+    double defocus_angle = 0;  // on simule la lentille de la caméra en définissant un angle de flou pour définir l'ouverture du diaphragme
+    double focus_dist = 10;    // Distance entre la position de la caméra et le plan du rendu où le focus est fait
 
     void render(const hittable& world,int nb_threads) {
         initialize();
@@ -48,7 +47,7 @@ class camera {
                     pixel_color += ray_color(r, max_depth, world);
                 }
                 buffer[j * image_width + i] = pixel_color;
-                // write_color(std::cout, pixel_color, samples_per_pixel);
+                // write_color(std::cout, pixel_color, samples_per_pixel); ne marche pas car on ne peut pas écrire dans le même flux depuis plusieurs threads
             }
         }
 
@@ -63,16 +62,14 @@ class camera {
     }
 
   private:
-    /* Private Camera Variables Here */
-
-    int    image_height;   // Rendered image height
-    point3 center;         // Camera center
-    point3 pixel00_loc;    // Location of pixel 0, 0
-    vec3   pixel_delta_u;  // Offset to pixel to the right
-    vec3   pixel_delta_v;  // Offset to pixel below
-    vec3   u, v, w;        // Camera frame basis vectors
-    vec3   defocus_disk_u;  // Defocus disk horizontal radius
-    vec3   defocus_disk_v;  // Defocus disk vertical radius
+    int    image_height;   // Hauteur de l'image en pixels
+    point3 center;         // Centre de la caméra
+    point3 pixel00_loc;    // Localisation du pixel 0, 0
+    vec3   pixel_delta_u;  // Ecart entre chaque pixel orienté vers la droite
+    vec3   pixel_delta_v;  // Ecart entre chaque pixel orienté vers le bas
+    vec3   u, v, w;        // Vecteur formant la base de la caméra
+    vec3   defocus_disk_u;  // vecteur horizontal pour le rayon du disque de défocalisation
+    vec3   defocus_disk_v;  // vecteur vertical pour le rayon du disque de défocalisation
 
     void initialize() {
         image_height = static_cast<int>(image_width / aspect_ratio);
@@ -80,38 +77,38 @@ class camera {
 
         center = lookfrom;
 
-        // Determine viewport dimensions.
+        // Dimensions de la fenêtre de rendu
         auto theta = degrees_to_radians(vfov); // vfov est en degrés, on le convertit en radians
         auto h = tan(theta/2); 
         auto viewport_height = 2 * h * focus_dist;
         auto viewport_width = viewport_height * (static_cast<double>(image_width)/image_height);
 
-        // Calculate the u,v,w unit basis vectors for the camera coordinate frame.
+        // Calcule les vecteur unitaires de la base pour les corrdonnées de la caméra
         w = unit_vector(lookfrom - lookat);
         u = unit_vector(cross(vup, w));
         v = cross(w, u);
 
-        // Calculate the vectors across the horizontal and down the vertical viewport edges.
-        vec3 viewport_u = viewport_width * u;    // Vector across viewport horizontal edge
-        vec3 viewport_v = viewport_height * -v;  // Vector down viewport vertical edge
+        // Calcule les vecteurs horizontaux et verticaux le long de la fenêtre d'affichage
+        vec3 viewport_u = viewport_width * u;    
+        vec3 viewport_v = viewport_height * -v;  // On inverse le vecteur v pour que le pixel 0,0 soit en haut à gauche
 
-        // Calculate the horizontal and vertical delta vectors from pixel to pixel.
+        // Calcule les vecteurs delta entre chaque pixel
         pixel_delta_u = viewport_u / image_width;
         pixel_delta_v = viewport_v / image_height;
 
-        // Calculate the location of the upper left pixel.
+        // Calcule la localisation du pixel 0,0
         auto viewport_upper_left = center - (focus_dist * w) - viewport_u/2 - viewport_v/2;
         pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
 
-        // Calculate the camera defocus disk basis vectors.
+        // Calcule les vecteurs de défocalisation, on spécifie l'angle du cone de sommet le centre de la fenêtre de rendu et de base le disque de défocalisation
         auto defocus_radius = focus_dist * tan(degrees_to_radians(defocus_angle / 2));
         defocus_disk_u = u * defocus_radius;
         defocus_disk_v = v * defocus_radius;
     }
 
     ray get_ray(int i, int j) const {
-        // Get a randomly-sampled camera ray for the pixel at location i,j, originating from the camera defocus disk.
-
+        // Retournes un rayon de caméra aléatoire pour le pixel à la position i,j, originaire du disque de défocalisation de la caméra. 
+        
         auto pixel_center = pixel00_loc + (i * pixel_delta_u) + (j * pixel_delta_v);
         auto pixel_sample = pixel_center + pixel_sample_square();
 
@@ -122,14 +119,14 @@ class camera {
     }
 
     vec3 pixel_sample_square() const {
-        // Returns a random point in the square surrounding a pixel at the origin.
+        // Retourne un point aléatoire dans le carré unité autour de l'origine
         auto px = -0.5 + random_double();
         auto py = -0.5 + random_double();
         return (px * pixel_delta_u) + (py * pixel_delta_v);
     }
 
     point3 defocus_disk_sample() const {
-        // Returns a random point in the camera defocus disk.
+        // Retourne un point aléatoire dans le disque de défocalisation de la caméra
         auto p = random_in_unit_disk();
         return center + (p[0] * defocus_disk_u) + (p[1] * defocus_disk_v);
     }
@@ -137,7 +134,7 @@ class camera {
     color ray_color(const ray& r, int depth, const hittable& world) const {
         hit_record rec;
 
-        // If we've exceeded the ray bounce limit, no more light is gathered.
+        // La fonction est récursive donc si on dépasse la limite de rebond, on renvoit un pixel noir
         if (depth <= 0)
             return color(0,0,0);
 
