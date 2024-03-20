@@ -15,15 +15,15 @@ class hit_record {
     bool front_face;
 
     void set_face_normal(const ray& r, const vec3& outward_normal) {
-        // Sets the hit record normal vector.
-        // NOTE: the parameter `outward_normal` is assumed to have unit length.
+        // donne la normale sortante de la surface touchée par le rayon
+        // outward_normal est un vecteur unitaire
 
         front_face = dot(r.direction(), outward_normal) < 0;
         normal = front_face ? outward_normal : -outward_normal;
     }
 };
 
-class hittable {
+class hittable { // hittable est une classe pour chaque objet qui peut être touché par un rayon
   public:
     virtual ~hittable() = default;
 
