@@ -51,7 +51,7 @@ class vec3 {
     }
 
     bool near_zero() const {
-        // Return true if the vector is close to zero in all dimensions.
+        // Vrai si le vecteur est proche de zéro sur chaque composante
         auto s = 1e-8;
         return (fabs(e[0]) < s) && (fabs(e[1]) < s) && (fabs(e[2]) < s);
     }
@@ -65,11 +65,8 @@ class vec3 {
     }
 };
 
-// point3 is just an alias for vec3, but useful for geometric clarity in the code.
+// point3 est juste un alias de vec3, c'est pour la clarté du code mais le compilateur ne fait pas de différence
 using point3 = vec3;
-
-
-// Vector Utility Functions
 
 inline std::ostream& operator<<(std::ostream &out, const vec3 &v) {
     return out << v.e[0] << ' ' << v.e[1] << ' ' << v.e[2];
@@ -148,7 +145,7 @@ vec3 reflect(const vec3& v, const vec3& n) { //réflexion sur un miroir par exem
 }
 
 inline vec3 refract(const vec3& uv, const vec3& n, double etai_over_etat) { // le rayon réfracté a une composante parallèle et une composante perpendiculaire à la normale
-    auto cos_theta = fmin(dot(-uv, n), 1.0); //le cosinus de l'angle incident se calcul avec le produit scalaire entre le vecteur incident et la normale
+    auto cos_theta = fmin(dot(-uv, n), 1.0); //le cosinus de l'angle incident se calcule avec le produit scalaire entre le vecteur incident et la normale
     vec3 r_out_perp =  etai_over_etat * (uv + cos_theta*n); // uv = - cos(theta) * n + sin(theta) * n_perp, et r_out_perp = etai_over_etat * sin(theta) * n_perp (loi de Snell-Descartes)
     vec3 r_out_parallel = -sqrt(fabs(1.0 - r_out_perp.length_squared())) * n; // il suffit d'écrire la composante parallèle et d'utiliser cos^2 + sin^2 = 1
     return r_out_perp + r_out_parallel;

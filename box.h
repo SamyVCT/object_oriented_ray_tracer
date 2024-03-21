@@ -14,7 +14,7 @@ class box : public hittable  {
         virtual bool hit(const ray& r, interval ray_t, hit_record& rec) const override;
 
 
-    public:
+    private:
         point3 box_min;
         point3 box_max;
         hittable_list sides;

@@ -18,17 +18,17 @@ int main() {
 
     world.add(make_shared<sphere>(point3( 0.0, -100.5, -1.0), 100.0, material_ground));
 
-    // world.add(make_shared<sphere>(point3( 0.0,    0.0, -1.0),   0.5, material_center));
-    // world.add(make_shared<sphere>(point3(-1.0,    0.0, -1.0),   0.5, material_left));
-    // world.add(make_shared<sphere>(point3(-1.0,    0.0, -1.0),  -0.4, material_left));
-    // world.add(make_shared<sphere>(point3( 1.0,    0.0, -1.0),   0.5, material_right));
+    world.add(make_shared<sphere>(point3( 0.0,    0.0, -1.0),   0.5, material_center));
+    world.add(make_shared<sphere>(point3(11.0,    0.0, -1.0),   0.5, material_left));
+    world.add(make_shared<sphere>(point3(1.0,    0.0, -1.0),  -0.4, material_left));
+    world.add(make_shared<sphere>(point3( -1.0,    0.0, -1.0),   0.5, material_right));
 
 
     // world.add(make_shared<xy_rect>(-0.5, 0.5, -1, 1, -1, material_center));
     // world.add(make_shared<xz_rect>(-0.5, 0.5, -1, 1, 1, material_center));
     // world.add(make_shared<yz_rect>(-1, 1, -1, 1, -0.5, material_center));
     
-    world.add(make_shared<box>(point3(-0.5, 0, 0), point3(0, 0.5, 0.5), material_center));
+    // world.add(make_shared<box>(point3(-0.5, 0, 0), point3(0, 0.5, 0.5), material_center));
 
     //NICE SCENE
     // auto ground_material = make_shared<lambertian>(color(0.5, 0.5, 0.5));
@@ -57,17 +57,17 @@ int main() {
     camera cam;
 
     cam.aspect_ratio      = 16.0 / 9.0;
-    cam.image_width       = 1200;
-    cam.samples_per_pixel = 300;
-    cam.max_depth         = 50;
+    cam.image_width       = 500;
+    cam.samples_per_pixel = 200;
+    cam.max_depth         = 40;
 
-    cam.vfov     = 20;
-    cam.lookfrom = point3(0.5,1,4);
-    cam.lookat   = point3(0,0,0);
+    cam.vfov     = 50;
+    cam.lookfrom = point3(2,2,1);
+    cam.lookat   = point3(0,0,-1);
     cam.vup      = vec3(0,1,0);
 
     cam.defocus_angle = 0;
-    cam.focus_dist    = 4;
+    cam.focus_dist    = 3.4;
     int nb_threads = 15;
 
     cam.render(world,nb_threads);

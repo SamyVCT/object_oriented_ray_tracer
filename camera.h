@@ -107,7 +107,7 @@ class camera {
     }
 
     ray get_ray(int i, int j) const {
-        // Retournes un rayon de caméra aléatoire pour le pixel à la position i,j, originaire du disque de défocalisation de la caméra. 
+        // Retourne un rayon de caméra aléatoire pour le pixel à la position i,j, provenant du disque de défocalisation de la caméra
         
         auto pixel_center = pixel00_loc + (i * pixel_delta_u) + (j * pixel_delta_v);
         auto pixel_sample = pixel_center + pixel_sample_square();
@@ -148,7 +148,7 @@ class camera {
 
         vec3 unit_direction = unit_vector(r.direction());
         auto a = 0.5*(unit_direction.y() + 1.0);
-        return (1.0-a)*color(1.0, 1.0, 1.0) + a*color(0.5, 0.7, 1.0);
+        return (1.0-a)*color(1.0, 1.0, 1.0) + a*color(0.5, 0.7, 1.0); // couleur du background (le ciel)
     }
 };
 

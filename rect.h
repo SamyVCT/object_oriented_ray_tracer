@@ -28,7 +28,7 @@ class xy_rect : public hittable { // on fixe z = k
             return true;
         }
 
-    public:
+    private:
         double x0, x1, y0, y1, k;
         shared_ptr<material> mp;
 };
@@ -54,7 +54,7 @@ class xz_rect : public hittable {
             rec.p = r.at(t);
             return true;
         }
-    public:
+    private:
         double x0, x1, z0, z1, k;
         shared_ptr<material> mp;
 };
@@ -82,7 +82,7 @@ class yz_rect : public hittable {
         }
         
 
-    public:
+    private:
         double y0, y1, z0, z1, k;
         shared_ptr<material> mp;
 

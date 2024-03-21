@@ -17,8 +17,7 @@ class lambertian : public material { // distribution lambertienne : un rayon est
   public:
     lambertian(const color& a) : albedo(a) {}
 
-    bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered)
-    const override {
+    bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const override {
         auto scatter_direction = rec.normal + random_unit_vector();
 
         // si le vecteur normal + le vecteur aléatoire est proche de zéro, on le remplace par la normale pour éviter des problèmes d'infini 
@@ -38,8 +37,7 @@ class metal : public material {
   public:
     metal(const color& a, double f) : albedo(a), flou(f < 1 ? f : 1) {} // le flou change légèrement le point d'arrivée du rayon réfléchi dans une sphère autour de ce point
 
-    bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered)
-    const override {
+    bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const override {
         vec3 reflected = reflect(unit_vector(r_in.direction()), rec.normal);
         scattered = ray(rec.p, reflected + flou*random_unit_vector());
         attenuation = albedo;
@@ -55,8 +53,7 @@ class dielectric : public material { // les matériaux transparents (verre, eau,
   public:
     dielectric(double index_of_refraction) : ir(index_of_refraction) {}
 
-    bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered)
-    const override {
+    bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const override {
         attenuation = color(1.0, 1.0, 1.0);
         double refraction_ratio = rec.front_face ? (1.0/ir) : ir;
 
