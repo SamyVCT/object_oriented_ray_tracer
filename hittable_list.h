@@ -9,6 +9,9 @@
 using std::shared_ptr;
 using std::make_shared;
 
+
+// on crée une liste d'hittables pour représenter le monde, qui contient tous les objets de la scène
+
 class hittable_list : public hittable {
   public:
     std::vector<shared_ptr<hittable>> objects;
