@@ -11,7 +11,7 @@ Il faut ensuite utiliser un lecteur de ppm, du genre : https://www.cs.rhodes.edu
 
 Ce projet s'appuie sur les différentes ressources ci-dessous :
 - https://research.project-10.de/openrt/#lectures
-- https://raytracing.github.io/books/RayTracingInOneWeekend.html#thevec3class
+- https://raytracing.github.io/books/RayTracingInOneWeekend.html
 - https://connect.ed-diamond.com/GNU-Linux-Magazine/glmf-122/decouverte-de-la-programmation-parallele-avec-openmp
 
 Améliorations à faire :
