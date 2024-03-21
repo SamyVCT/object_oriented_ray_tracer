@@ -11,6 +11,7 @@ using std::make_shared;
 
 
 // on crée une liste d'hittables pour représenter le monde, qui contient tous les objets de la scène
+// mais aussi pour créer un cube, qui est une liste de rectangles
 
 class hittable_list : public hittable {
   public:
