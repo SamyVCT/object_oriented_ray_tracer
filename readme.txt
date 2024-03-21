@@ -10,6 +10,7 @@ Ce projet s'appuie sur les différentes ressources ci-dessous :
 - https://connect.ed-diamond.com/GNU-Linux-Magazine/glmf-122/decouverte-de-la-programmation-parallele-avec-openmp
 
 
-Améliorations :
-- accélérer le calcul en implémentant des bounding boxes
+Améliorations à faire :
+- accélérer le calcul en implémentant des bounding boxes et en utilisant le GPU
 - faire des sources lumineuses
+- ajouter des textures et des objects plus complexes

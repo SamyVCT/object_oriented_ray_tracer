@@ -9,7 +9,8 @@ class xy_rect : public hittable { // on fixe z = k
     public:
         xy_rect() {}
 
-        xy_rect(double _x0, double _x1, double _y0, double _y1, double _k, shared_ptr<material> mat): x0(_x0), x1(_x1), y0(_y0), y1(_y1), k(_k), mp(mat) {};
+        xy_rect(double _x0, double _x1, double _y0, double _y1, double _k, shared_ptr<material> mat): 
+        x0(_x0), x1(_x1), y0(_y0), y1(_y1), k(_k), mp(mat) {};
 
         bool hit(const ray& r, interval ray_t, hit_record& rec) const override{
             auto t = (k-r.origin().z()) / r.direction().z();
